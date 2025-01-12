@@ -10,7 +10,7 @@ import axios from 'axios';
 interface AddProducerModalProps {
     openAddProducer: boolean;
     setOpenAddProducer: (open: boolean) => void;
-    fetchProducers: () => void;
+    fetchProducers?: () => void;
 }
 
 const AddProducerModal: FC<AddProducerModalProps> = ({ openAddProducer, setOpenAddProducer, fetchProducers }) => {
@@ -46,7 +46,7 @@ const AddProducerModal: FC<AddProducerModalProps> = ({ openAddProducer, setOpenA
                 gender: "",
                 bio: "",
             });
-            fetchProducers();
+            fetchProducers?.();
         }
     };
 

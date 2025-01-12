@@ -50,7 +50,7 @@ const Actors = () => {
         try {
             await axios.delete(`http://localhost:8000/api/actors/${actorId}`);
             toast({
-                description: "Employee deleted successfully.. ✔️",
+                description: "Actor deleted successfully.. ✔️",
             });
             fetchActors();
         } catch (error) {

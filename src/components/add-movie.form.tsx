@@ -3,19 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    // Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Producer } from './Producers';
 import Select from 'react-select';
 import { Actor } from './Actors';
+import AddActorModal from './modals/AddActorModal';
+import { useToast } from '@/hooks/use-toast';
+import AddProducerModal from './modals/AddProducerModal';
 
 export default function AddMovieForm() {
     const [selectedActors, setSelectedActors] = useState<string[]>([]);
@@ -23,6 +18,10 @@ export default function AddMovieForm() {
     const [producerList, setProducerList] = useState<Producer[]>([]);
     const [actorList, setActorList] = useState<Actor[]>([]);
     const [selectedProducer, setSelectedProducer] = useState('');
+    const [openAddActor, setOpenAddActor] = useState(false);
+    const [openAddProducer, setOpenAddProducer] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
 
     useEffect(() => {
         const fetchProducers = async () => {
@@ -51,17 +50,18 @@ export default function AddMovieForm() {
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
-        const reader = new FileReader();
-        reader.onloadend = function () {
-            setPreview(reader.result as string);
-        };
         if (file) {
+            const reader = new FileReader();
+            reader.onloadend = function () {
+                setPreview(reader.result as string);
+            };
             reader.readAsDataURL(file);
         }
     };
 
     const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setIsLoading(true);
 
         const formData = new FormData(event.currentTarget);
         if (preview) {
@@ -69,17 +69,28 @@ export default function AddMovieForm() {
         }
         const data = {
             name: formData.get('name'),
-            year: formData.get('year'),
+            yearOfRelease: formData.get('year'),
             plot: formData.get('plot'),
             poster: formData.get('poster'),
-            producer: selectedProducer, // Use the selected producer state
+            producer: selectedProducer,
             actors: selectedActors,
         };
+
+        if (!data.name || !data.yearOfRelease || !data.plot || !data.poster || !data.producer || data.actors.length === 0) {
+            toast({
+                description: "All fields are required.",
+            });
+            setIsLoading(false);
+            return;
+        }
+
         console.log(data);
         try {
-            // await axios.post('http://localhost:8000/api/movies', data);
+            await axios.post('http://localhost:8000/api/movies', data);
         } catch (error) {
             console.log('error: ', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -105,7 +116,7 @@ export default function AddMovieForm() {
                     <form onSubmit={handleFormSubmit} className="space-y-6">
                         <div className="space-y-2">
                             <Label htmlFor="name">Movie Name</Label>
-                            <Input id="name" name="name" required />
+                            <Input id="name" name="name" />
                         </div>
 
                         <div className="space-y-2">
@@ -117,7 +128,7 @@ export default function AddMovieForm() {
                                     return { value: year.toString(), label: year.toString() };
                                 })}
                                 placeholder="Select year"
-                                required
+                                className='border-red-500'
                             />
                         </div>
 
@@ -126,7 +137,6 @@ export default function AddMovieForm() {
                             <Textarea
                                 id="plot"
                                 name="plot"
-                                required
                                 className="min-h-[100px]"
                             />
                         </div>
@@ -138,7 +148,6 @@ export default function AddMovieForm() {
                                 name="poster"
                                 type="file"
                                 accept="image/*"
-                                required
                                 onChange={handleFileUpload}
                             />
                             {preview && (
@@ -148,40 +157,54 @@ export default function AddMovieForm() {
 
                         <div className="space-y-2">
                             <Label htmlFor="producer">Producer</Label>
-                            <Select
-                                name="producer"
-                                options={producerOptions}
-                                value={producerOptions.find(option => option.value === selectedProducer)}
-                                onChange={(option) => setSelectedProducer(option?.value || '')}
-                                isClearable
-                                required
-                            />
+                            <div className='flex space-x-2 w-full'>
+                                <Select
+                                    name="producer"
+                                    options={producerOptions}
+                                    value={producerOptions.find(option => option.value === selectedProducer)}
+                                    onChange={(option) => setSelectedProducer(option?.value || '')}
+                                    className='w-full'
+                                />
+                                <Button type="button" onClick={() => setOpenAddProducer(true)}>Add New Producer</Button>
+                            </div>
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="actors">Actors</Label>
-                            <Select
-                                isMulti
-                                name="actors"
-                                options={actorsOptions}
-                                value={selectedActors.map((actorId) => ({
-                                    value: actorId,
-                                    label: actorList.find((actor) => actor._id === actorId)?.name || '',
-                                }))}
-                                onChange={(selectedOptions) =>
-                                    setSelectedActors(selectedOptions.map((option) => option.value))
-                                }
-                                isSearchable
-                                required
-                            />
+                            <div className='flex space-x-2 w-full'>
+                                <Select
+                                    isMulti
+                                    name="actors"
+                                    options={actorsOptions}
+                                    value={selectedActors.map((actorId) => ({
+                                        value: actorId,
+                                        label: actorList.find((actor) => actor._id === actorId)?.name || '',
+                                    }))}
+                                    onChange={(selectedOptions) =>
+                                        setSelectedActors(selectedOptions.map((option) => option.value))
+                                    }
+                                    isSearchable
+                                    className="w-full"
+                                />
+                                <Button type="button" onClick={() => setOpenAddActor(true)}>Add New Actor</Button>
+                            </div>
                         </div>
 
-                        <Button type="submit" className="w-full">
-                            Create Movie
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading ? 'Adding...' : 'Add Movie'}
                         </Button>
                     </form>
                 </CardContent>
             </Card>
+
+            <AddActorModal
+                openAddActor={openAddActor}
+                setOpenAddActor={setOpenAddActor}
+            />
+            <AddProducerModal
+                openAddProducer={openAddProducer}
+                setOpenAddProducer={setOpenAddProducer}
+            />
         </div>
     );
 }

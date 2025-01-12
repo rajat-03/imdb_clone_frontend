@@ -11,7 +11,7 @@ import axios from 'axios';
 interface AddActorModalProps {
     openAddActor: boolean;
     setOpenAddActor: (open: boolean) => void;
-    fetchActors: () => void;
+    fetchActors?: () => void;
 }
 
 const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, fetchActors }) => {
@@ -24,7 +24,7 @@ const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, 
         bio: "",
     });
 
-    const handleAddEmployee = async () => {
+    const handleAddActor = async () => {
         if (!newActor.name || !newActor.dob || !newActor.gender || !newActor.bio) {
             toast({
                 description: "All fields are required.",
@@ -35,7 +35,7 @@ const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, 
         try {
             await axios.post("http://localhost:8000/api/actors", newActor);
             toast({
-                description: "Employee added successfully.. ✔️",
+                description: "Actor added successfully.. ✔️",
             });
             setOpenAddActor(false);
         } catch (error) {
@@ -47,7 +47,7 @@ const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, 
                 gender: "",
                 bio: "",
             });
-            fetchActors();
+            fetchActors?.();
         }
     };
 
@@ -123,7 +123,7 @@ const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, 
                                 >
                                     Cancel
                                 </Button>
-                                <Button size="sm" onClick={handleAddEmployee}>
+                                <Button size="sm" onClick={handleAddActor}>
                                     Add
                                 </Button>
                             </div>
