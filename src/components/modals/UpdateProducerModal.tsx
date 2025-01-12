@@ -3,43 +3,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from '@/hooks/use-toast';
-import { Actor } from '../Actors';
+import { Producer } from '../Producers';
 import axios from 'axios';
 import { Textarea } from '../ui/textarea';
 
-interface UpdateActorModalProps {
-    openUpdateActorDetail: boolean;
-    setOpenUpdateActorDetail: (open: boolean) => void;
-    actorId: string;
-    fetchActors: () => void;
+interface UpdateProducerModalProps {
+    openUpdateProducerDetail: boolean;
+    setOpenUpdateProducerDetail: (open: boolean) => void;
+    producerId: string;
+    fetchProducers: () => void;
 }
 
-const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDetail, setOpenUpdateActorDetail, actorId, fetchActors }) => {
+const UpdateProducerModal: React.FC<UpdateProducerModalProps> = ({ openUpdateProducerDetail, setOpenUpdateProducerDetail, producerId, fetchProducers }) => {
 
-    const [editingActor, setEditingActor] = useState<Actor>({
+    const [editingProducer, setEditingProducer] = useState<Producer>({
         name: "",
         dob: "",
         gender: "",
         bio: "",
     });
 
-    const fetchActorDetails = async (actorId: string) => {
+    const fetchProducerDetails = async (producerId: string) => {
         try {
-            const response = await axios.get(`http://localhost:8000/api/actors/${actorId}`);
-            setEditingActor(response.data);
+            const response = await axios.get(`http://localhost:8000/api/producers/${producerId}`);
+            setEditingProducer(response.data);
         } catch (error: any) {
-            console.error("Error fetching actor details:", error);
+            console.error("Error fetching producer details:", error);
         }
     }
 
     useEffect(() => {
-        if (actorId) { // Ensure actorId is valid
-            fetchActorDetails(actorId);
+        if (producerId) { // Ensure producerId is valid
+            fetchProducerDetails(producerId);
         }
-    }, [actorId]); // Include actorId in the dependency array
+    }, [producerId]); // Include producerId in the dependency array
 
-    const handleUpdateActor = async () => {
-        if (!editingActor.name || !editingActor.dob || !editingActor.gender || !editingActor.bio) {
+    const handleUpdateProducer = async () => {
+        if (!editingProducer.name || !editingProducer.dob || !editingProducer.gender || !editingProducer.bio) {
             toast({
                 description: "All fields are required.",
             });
@@ -47,47 +47,47 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
         }
 
         try {
-            await axios.put(`http://localhost:8000/api/actors/${actorId}`, editingActor);
+            await axios.put(`http://localhost:8000/api/producers/${producerId}`, editingProducer);
             toast({
-                description: "Actor updated successfully.. ✔️",
+                description: "Producer updated successfully.. ✔️",
             });
-            fetchActors();
-            setOpenUpdateActorDetail(false);
+            fetchProducers();
+            setOpenUpdateProducerDetail(false);
         } catch (error) {
             toast({
-                description: "Error updating actor.. ❌",
+                description: "Error updating producer.. ❌",
             });
-            console.error("Error updating actor:", error);
+            console.error("Error updating producer:", error);
         }
     };
 
     const handleCancelClick = () => {
-        setEditingActor({
+        setEditingProducer({
             name: "",
             dob: "",
             gender: "",
             bio: "",
         });
-        setOpenUpdateActorDetail(false);
+        setOpenUpdateProducerDetail(false);
     }
 
     const { toast } = useToast();
 
     return (
-        <>{openUpdateActorDetail &&
+        <>{openUpdateProducerDetail &&
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                 <div className="bg-white dark:bg-gray-950 rounded-lg shadow-md p-6 w-full max-w-md">
-                    <h2 className="text-xl font-bold mb-4">Edit Actor</h2>
+                    <h2 className="text-xl font-bold mb-4">Edit Producer</h2>
                     <div className="grid gap-4">
                         <div>
                             <Label htmlFor="name">Name</Label>
                             <Input
                                 id="name"
                                 type="text"
-                                value={editingActor.name || ""}
+                                value={editingProducer.name || ""}
                                 onChange={(e) =>
-                                    setEditingActor({
-                                        ...editingActor,
+                                    setEditingProducer({
+                                        ...editingProducer,
                                         name: e.target.value,
                                     })
                                 }
@@ -98,10 +98,10 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
                             <Input
                                 id="dob"
                                 type="date"
-                                value={editingActor.dob || ""}
+                                value={editingProducer.dob || ""}
                                 onChange={(e) =>
-                                    setEditingActor({
-                                        ...editingActor,
+                                    setEditingProducer({
+                                        ...editingProducer,
                                         dob: e.target.value,
                                     })
                                 }
@@ -111,9 +111,9 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
                                 <Label htmlFor="gender">Gender</Label>
                                 <select
                                     id="gender"
-                                    value={editingActor.gender}
+                                    value={editingProducer.gender}
                                     onChange={(e) =>
-                                        setEditingActor({ ...editingActor, gender: e.target.value })
+                                        setEditingProducer({ ...editingProducer, gender: e.target.value })
                                     }
                                     className="border rounded p-2 w-full"
                                 >
@@ -127,10 +127,10 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
                             <Textarea
                                 id="bio"
                                 rows={4}
-                                value={editingActor.bio || ""}
+                                value={editingProducer.bio || ""}
                                 onChange={(e) =>
-                                    setEditingActor({
-                                        ...editingActor,
+                                    setEditingProducer({
+                                        ...editingProducer,
                                         bio: e.target.value,
                                     })
                                 }
@@ -144,7 +144,7 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
                             >
                                 Cancel
                             </Button>
-                            <Button size="sm" onClick={handleUpdateActor}>
+                            <Button size="sm" onClick={handleUpdateProducer}>
                                 Update
                             </Button>
                         </div>
@@ -156,4 +156,4 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
     );
 };
 
-export default UpdateActorModal;
+export default UpdateProducerModal;
