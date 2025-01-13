@@ -19,22 +19,20 @@ export interface Movie {
 const Movies = () => {
   const navigate = useNavigate()
 
-  const [err, setErr] = useState("");
-
 
   const [movies, setMovies] = useState<Movie[]>([]);
 
 
-  useEffect(() => {
+  const fetchMovies = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/movies');
+      setMovies(response.data);
+    } catch (error) {
+      console.log('error: ', error);
+    }
+  };
 
-    const fetchMovies = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/api/movies');
-        setMovies(response.data);
-      } catch (error) {
-        console.log('error: ', error);
-      }
-    };
+  useEffect(() => {
 
     fetchMovies();
   }, []);
@@ -52,7 +50,7 @@ const Movies = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {movies.map((movie, index) => (
             <div key={index}>
-              <MovieCard movie={movie} />
+              <MovieCard movie={movie} fetchMovies={fetchMovies}/>
             </div>
           ))}
         </div>

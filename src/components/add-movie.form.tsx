@@ -11,6 +11,7 @@ import { Actor } from './Actors';
 import AddActorModal from './modals/AddActorModal';
 import { useToast } from '@/hooks/use-toast';
 import AddProducerModal from './modals/AddProducerModal';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function AddMovieForm() {
     const [selectedActors, setSelectedActors] = useState<string[]>([]);
@@ -22,12 +23,34 @@ export default function AddMovieForm() {
     const [openAddProducer, setOpenAddProducer] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
+    const navigate = useNavigate();
 
+    // catch the state which is send when clicked on edit
+    const location = useLocation();
+    const state = location.state;
+
+    console.log("movieId", state.movieId);
+
+    const fetchMovieDetailById = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/movies/${state.movieId}`);
+            console.log('movie detail: ', response.data);
+            // setMovieDetail(response.data);
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    }
+
+    useEffect(() => {
+        if (state.movieId) {
+            fetchMovieDetailById();
+        }
+
+    }, [])
 
     const fetchProducers = async () => {
         try {
             const response = await axios.get('http://localhost:8000/api/producers');
-            console.log('producer list: ', response.data);
             setProducerList(response.data);
         } catch (error) {
             console.log('error: ', error);
@@ -37,7 +60,6 @@ export default function AddMovieForm() {
     const fetchActors = async () => {
         try {
             const response = await axios.get('http://localhost:8000/api/actors');
-            console.log('actor list: ', response.data);
             setActorList(response.data);
         } catch (error) {
             console.log('error: ', error);
@@ -91,6 +113,7 @@ export default function AddMovieForm() {
             toast({
                 description: "Movie added successfully.",
             });
+            navigate("/")
         } catch (error) {
             console.log('error: ', error);
             toast({

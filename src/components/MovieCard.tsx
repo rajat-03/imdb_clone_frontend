@@ -1,21 +1,23 @@
-
 import { Badge } from "./ui/badge";
-import { User, Users, Video } from 'lucide-react';
+import { Button } from "./ui/button";
+import { User, Users, Video, Trash2, Edit } from 'lucide-react';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Actor } from "./Actors";
 import { Producer } from "./Producers";
 import { Movie } from "./Movies";
+import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
-function MovieCard({ movie }: { movie: Movie }) {
+function MovieCard({ movie, fetchMovies }: { movie: Movie, fetchMovies: () => void }) {
   const [producerList, setProducerList] = useState<Producer[]>([]);
   const [actorList, setActorList] = useState<Actor[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducers = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/producers');
-        console.log('producer list: ', response.data);
         setProducerList(response.data);
       } catch (error) {
         console.log('error: ', error);
@@ -25,7 +27,6 @@ function MovieCard({ movie }: { movie: Movie }) {
     const fetchActors = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/actors');
-        console.log('actor list: ', response.data);
         setActorList(response.data);
       } catch (error) {
         console.log('error: ', error);
@@ -46,10 +47,31 @@ function MovieCard({ movie }: { movie: Movie }) {
     return actor ? actor.name : 'Unknown Actor';
   };
 
+  const handleDeleteMovie = async (movieId: string) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/movies/${movieId}`);
+      toast({
+        description: "Movie deleted successfully.. ✔️",
+      });
+      fetchMovies()
+    } catch (error) {
+      toast({
+        description: "Error deleting movie.. ❌",
+      });
+      console.log(error);
+    }
+
+
+  }
+
+  const handleEditMovie = (movieId: string) => {
+    navigate("/movies/add", { state: { movieId } });
+  }
+
   return (
     <div className='flex items-center justify-center'>
       <div className=' mx-auto bg-white rounded-3xl shadow-xl'>
-        <div className="grid rounded-3xl max-w-[360px] shadow-sm bg-slate-200  flex-col">
+        <div className="group rounded-3xl max-w-[360px] shadow-sm bg-slate-200 flex-col">
           <img
             src={movie.poster}
             width="360"
@@ -58,21 +80,19 @@ function MovieCard({ movie }: { movie: Movie }) {
             alt="movie.title"
           />
 
-          <div className="group p-5 grid z-10">
-            <h2
-              className=" font-bold md:text-2xl line-clamp-2"
-            >
+          <div className="group p-5 grid z-10 relative">
+            <h2 className="font-bold md:text-2xl line-clamp-2">
               {movie.name}
             </h2>
             <span className="text-slate-400 pt-2 font-semibold">
               {movie.yearOfRelease}
             </span>
             <div className="">
-              <span className="line-clamp-4 py-2   text-sm font-light ">
+              <span className="line-clamp-4 py-2 text-sm font-light">
                 {movie.plot}
               </span>
             </div>
-            <div className=" ">
+            <div className="">
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <Video className="h-4 w-4 opacity-70" />
@@ -85,10 +105,7 @@ function MovieCard({ movie }: { movie: Movie }) {
                     <span className="text-muted-foreground">Cast:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {movie.actors.map((actorId: string) => (
-                        <Badge
-                          key={actorId}
-                          variant="outline"
-                        >
+                        <Badge key={actorId} variant="outline">
                           <User className="mr-1 h-3 w-3" />
                           {getActorName(actorId)}
                         </Badge>
@@ -97,6 +114,15 @@ function MovieCard({ movie }: { movie: Movie }) {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="absolute right-2 bottom-2 flex gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <Button size="icon" variant="secondary" className="h-8 w-8" onClick={ ()=> handleEditMovie(movie._id!)}>
+                <Edit className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="destructive" className="h-8 w-8" onClick={() => handleDeleteMovie(movie._id!)}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
