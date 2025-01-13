@@ -11,7 +11,7 @@ import axios from 'axios';
 interface AddActorModalProps {
     openAddActor: boolean;
     setOpenAddActor: (open: boolean) => void;
-    fetchActors?: () => void;
+    fetchActors: () => void;
 }
 
 const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, fetchActors }) => {
@@ -47,7 +47,7 @@ const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, 
                 gender: "",
                 bio: "",
             });
-            fetchActors?.();
+            fetchActors();
         }
     };
 

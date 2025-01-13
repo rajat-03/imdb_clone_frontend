@@ -1,7 +1,6 @@
-import { toast } from "react-toastify";
-import { Card, CardContent, CardDescription, CardHeader } from "./ui/card";
+
 import { Badge } from "./ui/badge";
-import { Calendar, User, Users, Video } from 'lucide-react';
+import { User, Users, Video } from 'lucide-react';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Actor } from "./Actors";
@@ -48,9 +47,9 @@ function MovieCard({ movie }: { movie: Movie }) {
   };
 
   return (
-    <div className='flex items-center justify-center h-screen bg-[#0d1829] '>
+    <div className='flex items-center justify-center'>
       <div className=' mx-auto bg-white rounded-3xl shadow-xl'>
-        <div className="grid rounded-3xl max-w-[360px] shadow-sm bg-slate-100  flex-col">
+        <div className="grid rounded-3xl max-w-[360px] shadow-sm bg-slate-200  flex-col">
           <img
             src={movie.poster}
             width="360"
@@ -68,8 +67,8 @@ function MovieCard({ movie }: { movie: Movie }) {
             <span className="text-slate-400 pt-2 font-semibold">
               {movie.yearOfRelease}
             </span>
-            <div className="h-20">
-              <span className="line-clamp-3 py-2 h-20 leading-6 text-sm font-light leading-relaxed">
+            <div className="">
+              <span className="line-clamp-4 py-2   text-sm font-light ">
                 {movie.plot}
               </span>
             </div>

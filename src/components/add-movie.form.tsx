@@ -23,26 +23,28 @@ export default function AddMovieForm() {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
 
-    useEffect(() => {
-        const fetchProducers = async () => {
-            try {
-                const response = await axios.get('http://localhost:8000/api/producers');
-                console.log('producer list: ', response.data);
-                setProducerList(response.data);
-            } catch (error) {
-                console.log('error: ', error);
-            }
-        };
 
-        const fetchActors = async () => {
-            try {
-                const response = await axios.get('http://localhost:8000/api/actors');
-                console.log('actor list: ', response.data);
-                setActorList(response.data);
-            } catch (error) {
-                console.log('error: ', error);
-            }
-        };
+    const fetchProducers = async () => {
+        try {
+            const response = await axios.get('http://localhost:8000/api/producers');
+            console.log('producer list: ', response.data);
+            setProducerList(response.data);
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
+    const fetchActors = async () => {
+        try {
+            const response = await axios.get('http://localhost:8000/api/actors');
+            console.log('actor list: ', response.data);
+            setActorList(response.data);
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
+    useEffect(() => {
 
         fetchProducers();
         fetchActors();
@@ -84,11 +86,16 @@ export default function AddMovieForm() {
             return;
         }
 
-        console.log(data);
         try {
             await axios.post('http://localhost:8000/api/movies', data);
+            toast({
+                description: "Movie added successfully.",
+            });
         } catch (error) {
             console.log('error: ', error);
+            toast({
+                description: "Failed to add movie.",
+            });
         } finally {
             setIsLoading(false);
         }
@@ -200,10 +207,13 @@ export default function AddMovieForm() {
             <AddActorModal
                 openAddActor={openAddActor}
                 setOpenAddActor={setOpenAddActor}
+                fetchActors={fetchActors}
+
             />
             <AddProducerModal
                 openAddProducer={openAddProducer}
                 setOpenAddProducer={setOpenAddProducer}
+                fetchProducers={fetchProducers}
             />
         </div>
     );

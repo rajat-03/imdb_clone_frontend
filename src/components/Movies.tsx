@@ -3,8 +3,6 @@ import axios from 'axios';
 import { Button } from './ui/button'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react';
-import { Producer } from './Producers';
-import { Actor } from './Actors';
 import MovieCard from './MovieCard';
 
 
@@ -49,9 +47,9 @@ const Movies = () => {
 
         <Button onClick={() => navigate("/movies/add")}>Add Movie</Button>
       </div>
-      <div className="bg-gray-950 rounded-lg shadow-md overflow-hidden w-full">
+      <div className=" rounded overflow-hidden w-full">
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {movies.map((movie, index) => (
             <div key={index}>
               <MovieCard movie={movie} />
