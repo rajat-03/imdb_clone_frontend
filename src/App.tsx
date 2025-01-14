@@ -11,7 +11,6 @@ function App() {
 
   return (
     <div>
-      {/* <AddMovieForm /> */}
       <Toaster />
       <Routes>
         <Route path="/" element={<Dashboard />}>

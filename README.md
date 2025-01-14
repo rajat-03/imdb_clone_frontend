@@ -1,6 +1,6 @@
 # IMDb Clone
 
-Link - 
+Link - https://imdb-clone-frontend-rajat03s-projects.vercel.app
 
 GitHub Link Backend - https://github.com/rajat-03/imdb_clone_backend.git
 
