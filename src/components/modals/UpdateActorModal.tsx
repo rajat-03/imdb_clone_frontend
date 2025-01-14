@@ -25,7 +25,7 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
 
     const fetchActorDetails = async (actorId: string) => {
         try {
-            const response = await axios.get(`http://localhost:8000/api/actors/${actorId}`);
+            const response = await axios.get(`https://imdb-clone-backend-971u.onrender.com/api/actors/${actorId}`);
             setEditingActor(response.data);
         } catch (error: any) {
             console.error("Error fetching actor details:", error);
@@ -47,7 +47,7 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
         }
 
         try {
-            await axios.put(`http://localhost:8000/api/actors/${actorId}`, editingActor);
+            await axios.put(`https://imdb-clone-backend-971u.onrender.com/api/actors/${actorId}`, editingActor);
             toast({
                 description: "Actor updated successfully.. ✔️",
             });
@@ -108,20 +108,20 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
                             />
                         </div>
                         <div>
-                                <Label htmlFor="gender">Gender</Label>
-                                <select
-                                    id="gender"
-                                    value={editingActor.gender}
-                                    onChange={(e) =>
-                                        setEditingActor({ ...editingActor, gender: e.target.value })
-                                    }
-                                    className="border rounded p-2 w-full"
-                                >
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
+                            <Label htmlFor="gender">Gender</Label>
+                            <select
+                                id="gender"
+                                value={editingActor.gender}
+                                onChange={(e) =>
+                                    setEditingActor({ ...editingActor, gender: e.target.value })
+                                }
+                                className="border rounded p-2 w-full"
+                            >
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
                         <div>
                             <Label htmlFor="bio">Bio</Label>
                             <Textarea

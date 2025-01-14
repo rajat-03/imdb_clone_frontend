@@ -17,7 +17,7 @@ function MovieCard({ movie, fetchMovies }: { movie: Movie, fetchMovies: () => vo
   useEffect(() => {
     const fetchProducers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/producers');
+        const response = await axios.get('https://imdb-clone-backend-971u.onrender.com/api/producers');
         setProducerList(response.data);
       } catch (error) {
         console.log('error: ', error);
@@ -26,7 +26,7 @@ function MovieCard({ movie, fetchMovies }: { movie: Movie, fetchMovies: () => vo
 
     const fetchActors = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/actors');
+        const response = await axios.get('https://imdb-clone-backend-971u.onrender.com/api/actors');
         setActorList(response.data);
       } catch (error) {
         console.log('error: ', error);
@@ -49,7 +49,7 @@ function MovieCard({ movie, fetchMovies }: { movie: Movie, fetchMovies: () => vo
 
   const handleDeleteMovie = async (movieId: string) => {
     try {
-      await axios.delete(`http://localhost:8000/api/movies/${movieId}`);
+      await axios.delete(`https://imdb-clone-backend-971u.onrender.com/api/movies/${movieId}`);
       toast({
         description: "Movie deleted successfully.. ✔️",
       });
@@ -117,7 +117,7 @@ function MovieCard({ movie, fetchMovies }: { movie: Movie, fetchMovies: () => vo
             </div>
 
             <div className="absolute right-2 bottom-2 flex gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <Button size="icon" variant="secondary" className="h-8 w-8" onClick={ ()=> handleEditMovie(movie._id!)}>
+              <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => handleEditMovie(movie._id!)}>
                 <Edit className="h-4 w-4" />
               </Button>
               <Button size="icon" variant="destructive" className="h-8 w-8" onClick={() => handleDeleteMovie(movie._id!)}>

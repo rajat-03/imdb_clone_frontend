@@ -20,8 +20,6 @@ function App() {
           <Route path="/actors" element={<Actors />}></Route>
           <Route path="/producers" element={<Producers />}></Route>
         </Route>
-        {/* <Route path="/login" element={<Login />}></Route>
-        <Route path="/signup" element={<Signup />}></Route> */}
       </Routes>
     </div>
   )

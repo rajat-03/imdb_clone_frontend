@@ -1,26 +1,6 @@
-import React, { useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-// import IMDBIcon from "../assets/imdb_icon.png";
-import Footer from "./Footer";
+import { NavLink, Outlet } from "react-router-dom";
 
 function Dashboard() {
-  const navigate = useNavigate();
-
-//   const handleLogout = () => {
-//     localStorage.removeItem("token");
-//     navigate("/");
-//   };
-
-//   const checkToken = () => {
-//     if (!localStorage.getItem("token")) {
-//       navigate("/login", { replace: true });
-//     }
-//   };
-
-//   useEffect(() => {
-//     checkToken();
-//   }, []);
-
   return (
     <>
       <div className="flex flex-col min-h-screen">
@@ -28,50 +8,48 @@ function Dashboard() {
         <div className="bg-black text-white">
           <nav className="flex items-center justify-between px-6 py-4">
             <NavLink to={"/"} className="flex items-center">
-              {/* <img src={IMDBIcon} alt="imdb_icon" className="w-12" /> */}
+              <img src="/imdb.png" alt="imdb_icon" className="w-12" />
             </NavLink>
-            <button
-              className="md:hidden text-white focus:outline-none"
-              type="button"
-              aria-label="Toggle navigation"
-            >
-              <span className="block w-6 h-0.5 bg-white mb-1"></span>
-              <span className="block w-6 h-0.5 bg-white mb-1"></span>
-              <span className="block w-6 h-0.5 bg-white"></span>
-            </button>
-            <ul className="hidden md:flex space-x-6 text-lg">
+
+            <ul className="flex space-x-6 text-lg">
               <li>
-                <NavLink to="/" className="hover:underline">
+                <NavLink
+                  to="/"
+                  className={({ isActive }) =>
+                    isActive ? "bg-yellow-500 hover:underline px-2 py-1 rounded-md" : "hover:underline"
+                  }
+                >
                   Movies
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/actors" className="hover:underline">
+                <NavLink
+                  to="/actors"
+                  className={({ isActive }) =>
+                    isActive ? "bg-yellow-500 hover:underline px-2 py-1 rounded-md" : "hover:underline"
+                  }
+                >
                   Actors
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/producers" className="hover:underline">
+                <NavLink
+                  to="/producers"
+                  className={({ isActive }) =>
+                    isActive ? "bg-yellow-500 hover:underline px-2 py-1 rounded-md" : "hover:underline"
+                  }
+                >
                   Producers
                 </NavLink>
               </li>
-              <li>
-                <button
-                //   onClick={handleLogout}
-                  className="hover:underline text-red-500"
-                >
-                  Logout
-                </button>
-              </li>
             </ul>
+            <div></div>
           </nav>
         </div>
         {/* Main Content */}
         <div className="flex-grow">
           <Outlet />
         </div>
-        {/* Footer */}
-        {/* <Footer /> */}
       </div>
     </>
   );

@@ -32,7 +32,7 @@ const AddProducerModal: FC<AddProducerModalProps> = ({ openAddProducer, setOpenA
         }
 
         try {
-            await axios.post("http://localhost:8000/api/producers", newProducer);
+            await axios.post("https://imdb-clone-backend-971u.onrender.com/api/producers", newProducer);
             toast({
                 description: "Producer added successfully.. ✔️",
             });

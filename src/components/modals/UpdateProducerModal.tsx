@@ -25,7 +25,7 @@ const UpdateProducerModal: React.FC<UpdateProducerModalProps> = ({ openUpdatePro
 
     const fetchProducerDetails = async (producerId: string) => {
         try {
-            const response = await axios.get(`http://localhost:8000/api/producers/${producerId}`);
+            const response = await axios.get(`https://imdb-clone-backend-971u.onrender.com/api/producers/${producerId}`);
             setEditingProducer(response.data);
         } catch (error: any) {
             console.error("Error fetching producer details:", error);
@@ -47,7 +47,7 @@ const UpdateProducerModal: React.FC<UpdateProducerModalProps> = ({ openUpdatePro
         }
 
         try {
-            await axios.put(`http://localhost:8000/api/producers/${producerId}`, editingProducer);
+            await axios.put(`https://imdb-clone-backend-971u.onrender.com/api/producers/${producerId}`, editingProducer);
             toast({
                 description: "Producer updated successfully.. ✔️",
             });
@@ -108,20 +108,20 @@ const UpdateProducerModal: React.FC<UpdateProducerModalProps> = ({ openUpdatePro
                             />
                         </div>
                         <div>
-                                <Label htmlFor="gender">Gender</Label>
-                                <select
-                                    id="gender"
-                                    value={editingProducer.gender}
-                                    onChange={(e) =>
-                                        setEditingProducer({ ...editingProducer, gender: e.target.value })
-                                    }
-                                    className="border rounded p-2 w-full"
-                                >
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
+                            <Label htmlFor="gender">Gender</Label>
+                            <select
+                                id="gender"
+                                value={editingProducer.gender}
+                                onChange={(e) =>
+                                    setEditingProducer({ ...editingProducer, gender: e.target.value })
+                                }
+                                className="border rounded p-2 w-full"
+                            >
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
                         <div>
                             <Label htmlFor="bio">Bio</Label>
                             <Textarea

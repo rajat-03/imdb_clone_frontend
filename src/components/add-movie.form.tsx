@@ -14,43 +14,52 @@ import AddProducerModal from './modals/AddProducerModal';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function AddMovieForm() {
+    const [movieName, setMovieName] = useState('');
+    const [yearOfRelease, setYearOfRelease] = useState('');
+    const [plot, setPlot] = useState('');
+    const [poster, setPoster] = useState<string | null>(null);
     const [selectedActors, setSelectedActors] = useState<string[]>([]);
-    const [preview, setPreview] = useState<string | null>(null);
+    const [selectedProducer, setSelectedProducer] = useState('');
     const [producerList, setProducerList] = useState<Producer[]>([]);
     const [actorList, setActorList] = useState<Actor[]>([]);
-    const [selectedProducer, setSelectedProducer] = useState('');
     const [openAddActor, setOpenAddActor] = useState(false);
     const [openAddProducer, setOpenAddProducer] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const navigate = useNavigate();
 
-    // catch the state which is send when clicked on edit
     const location = useLocation();
     const state = location.state;
 
-    console.log("movieId", state.movieId);
-
+    // For update: Fetch movie details
     const fetchMovieDetailById = async () => {
         try {
-            const response = await axios.get(`http://localhost:8000/api/movies/${state.movieId}`);
-            console.log('movie detail: ', response.data);
-            // setMovieDetail(response.data);
+            const response = await axios.get(`https://imdb-clone-backend-971u.onrender.com/api/movies/${state.movieId}`);
+            const movieData = response.data;
+
+            // Prefill the form with movie details
+            setMovieName(movieData.name);
+            setYearOfRelease(movieData.yearOfRelease);
+            setPlot(movieData.plot);
+            setPoster(movieData.poster);
+            setSelectedProducer(movieData.producer);
+            setSelectedActors(movieData.actors.map((actorId: string) => actorId));
         } catch (error) {
             console.log('error: ', error);
         }
-    }
+    };
 
     useEffect(() => {
-        if (state.movieId) {
+        if (state?.movieId) {
             fetchMovieDetailById();
         }
-
-    }, [])
+        fetchProducers();
+        fetchActors();
+    }, [state?.movieId]);
 
     const fetchProducers = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/api/producers');
+            const response = await axios.get('https://imdb-clone-backend-971u.onrender.com/api/producers');
             setProducerList(response.data);
         } catch (error) {
             console.log('error: ', error);
@@ -59,25 +68,19 @@ export default function AddMovieForm() {
 
     const fetchActors = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/api/actors');
+            const response = await axios.get('https://imdb-clone-backend-971u.onrender.com/api/actors');
             setActorList(response.data);
         } catch (error) {
             console.log('error: ', error);
         }
     };
 
-    useEffect(() => {
-
-        fetchProducers();
-        fetchActors();
-    }, []);
-
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
         if (file) {
             const reader = new FileReader();
             reader.onloadend = function () {
-                setPreview(reader.result as string);
+                setPoster(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
@@ -87,20 +90,7 @@ export default function AddMovieForm() {
         event.preventDefault();
         setIsLoading(true);
 
-        const formData = new FormData(event.currentTarget);
-        if (preview) {
-            formData.set('poster', preview);
-        }
-        const data = {
-            name: formData.get('name'),
-            yearOfRelease: formData.get('year'),
-            plot: formData.get('plot'),
-            poster: formData.get('poster'),
-            producer: selectedProducer,
-            actors: selectedActors,
-        };
-
-        if (!data.name || !data.yearOfRelease || !data.plot || !data.poster || !data.producer || data.actors.length === 0) {
+        if (!movieName || !yearOfRelease || !plot || !poster || !selectedProducer || selectedActors.length === 0) {
             toast({
                 description: "All fields are required.",
             });
@@ -108,16 +98,35 @@ export default function AddMovieForm() {
             return;
         }
 
+        const data = {
+            name: movieName,
+            yearOfRelease,
+            plot,
+            poster,
+            producer: selectedProducer,
+            actors: selectedActors,
+        };
+
         try {
-            await axios.post('http://localhost:8000/api/movies', data);
-            toast({
-                description: "Movie added successfully.",
-            });
-            navigate("/")
+            if (state?.movieId) {
+                // Update existing movie
+                await axios.put(`https://imdb-clone-backend-971u.onrender.com/api/movies/${state.movieId}`, data);
+                toast({
+
+                    description: "Movie updated successfully.",
+                });
+            } else {
+                // Add new movie
+                await axios.post('https://imdb-clone-backend-971u.onrender.com/api/movies', data);
+                toast({
+                    description: "Movie added successfully.",
+                });
+            }
+            navigate("/");
         } catch (error) {
             console.log('error: ', error);
             toast({
-                description: "Failed to add movie.",
+                description: "Failed to save movie.",
             });
         } finally {
             setIsLoading(false);
@@ -140,13 +149,18 @@ export default function AddMovieForm() {
         <div className='pt-6'>
             <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader>
-                    <CardTitle>Add New Movie</CardTitle>
+                    <CardTitle>{state?.movieId ? 'Update Movie' : 'Add New Movie'}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleFormSubmit} className="space-y-6">
                         <div className="space-y-2">
                             <Label htmlFor="name">Movie Name</Label>
-                            <Input id="name" name="name" />
+                            <Input
+                                id="name"
+                                name="name"
+                                value={movieName}
+                                onChange={(e) => setMovieName(e.target.value)}
+                            />
                         </div>
 
                         <div className="space-y-2">
@@ -157,8 +171,9 @@ export default function AddMovieForm() {
                                     const year = new Date().getFullYear() - i;
                                     return { value: year.toString(), label: year.toString() };
                                 })}
+                                value={{ label: yearOfRelease, value: yearOfRelease }}
+                                onChange={(option) => setYearOfRelease(option?.value || '')}
                                 placeholder="Select year"
-                                className='border-red-500'
                             />
                         </div>
 
@@ -168,6 +183,8 @@ export default function AddMovieForm() {
                                 id="plot"
                                 name="plot"
                                 className="min-h-[100px]"
+                                value={plot}
+                                onChange={(e) => setPlot(e.target.value)}
                             />
                         </div>
 
@@ -180,8 +197,8 @@ export default function AddMovieForm() {
                                 accept="image/*"
                                 onChange={handleFileUpload}
                             />
-                            {preview && (
-                                <img src={preview} alt="Poster Preview" className="mt-2 max-h-64" />
+                            {poster && (
+                                <img src={poster} alt="Poster Preview" className="mt-2 max-h-64" />
                             )}
                         </div>
 
@@ -220,8 +237,9 @@ export default function AddMovieForm() {
                             </div>
                         </div>
 
+
                         <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? 'Adding...' : 'Add Movie'}
+                            {isLoading ? 'Saving...' : state?.movieId ? 'Update Movie' : 'Add Movie'}
                         </Button>
                     </form>
                 </CardContent>
@@ -231,7 +249,6 @@ export default function AddMovieForm() {
                 openAddActor={openAddActor}
                 setOpenAddActor={setOpenAddActor}
                 fetchActors={fetchActors}
-
             />
             <AddProducerModal
                 openAddProducer={openAddProducer}

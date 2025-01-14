@@ -24,16 +24,19 @@ export interface Actor {
 const Actors = () => {
     const { toast } = useToast();
     const [actors, setActors] = useState<Actor[]>([]);
+    const [loading, setLoading] = useState(true);
     const [openAddActor, setOpenAddActor] = useState(false);
     const [openUpdateActorDetail, setOpenUpdateActorDetail] = useState(false);
     const [selectedActorId, setSelectedActorId] = useState("");
 
     const fetchActors = async () => {
         try {
-            const response = await axios.get("http://localhost:8000/api/actors");
+            const response = await axios.get("https://imdb-clone-backend-971u.onrender.com/api/actors");
             setActors(response.data);
         } catch (error) {
             console.log("error: ", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -48,7 +51,7 @@ const Actors = () => {
 
     const handleDeleteActor = async (actorId: string) => {
         try {
-            await axios.delete(`http://localhost:8000/api/actors/${actorId}`);
+            await axios.delete(`https://imdb-clone-backend-971u.onrender.com/api/actors/${actorId}`);
             toast({
                 description: "Actor deleted successfully.. ✔️",
             });
@@ -66,53 +69,59 @@ const Actors = () => {
                 <Button onClick={() => setOpenAddActor(true)}>Add Actor</Button>
             </div>
             <div className="bg-white dark:bg-gray-950 rounded-lg shadow-md overflow-hidden">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>S.No</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>DOB</TableHead>
-                            <TableHead>Gender</TableHead>
-                            <TableHead className="max-w-lg">Bio</TableHead>
-                            <TableHead className="text-center">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {actors.map((actor, index: number) => (
-                            <TableRow key={actor._id}>
-                                <TableCell>{index + 1}</TableCell>
-
-                                <TableCell className="font-medium">{actor.name}</TableCell>
-                                <TableCell>{actor.dob}</TableCell>
-                                <TableCell>{actor.gender}</TableCell>
-                                <TableCell className="max-w-lg">
-                                    <p className="line-clamp-4">{actor.bio}</p>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex space-x-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="mr-2"
-                                            onClick={() =>
-                                                actor._id && handleEditActorDetail(actor._id)
-                                            }
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={() => actor._id && handleDeleteActor(actor._id)}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </div>
-                                </TableCell>
+                {loading ? (
+                    <div className="p-4 text-center">Loading...</div>
+                ) : actors.length === 0 ? (
+                    <div className="p-4 text-center">No data available</div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>S.No</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>DOB</TableHead>
+                                <TableHead>Gender</TableHead>
+                                <TableHead className="max-w-lg">Bio</TableHead>
+                                <TableHead className="text-center">Actions</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {actors.map((actor, index: number) => (
+                                <TableRow key={actor._id}>
+                                    <TableCell>{index + 1}</TableCell>
+
+                                    <TableCell className="font-medium">{actor.name}</TableCell>
+                                    <TableCell>{actor.dob}</TableCell>
+                                    <TableCell>{actor.gender}</TableCell>
+                                    <TableCell className="max-w-lg">
+                                        <p className="line-clamp-4">{actor.bio}</p>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex space-x-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="mr-2"
+                                                onClick={() =>
+                                                    actor._id && handleEditActorDetail(actor._id)
+                                                }
+                                            >
+                                                Edit
+                                            </Button>
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                onClick={() => actor._id && handleDeleteActor(actor._id)}
+                                            >
+                                                Delete
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
             </div>
 
             <AddActorModal

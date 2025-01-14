@@ -33,7 +33,7 @@ const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, 
         }
 
         try {
-            await axios.post("http://localhost:8000/api/actors", newActor);
+            await axios.post("https://imdb-clone-backend-971u.onrender.com/api/actors", newActor);
             toast({
                 description: "Actor added successfully.. ✔️",
             });
