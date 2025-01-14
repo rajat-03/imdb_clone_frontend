@@ -7,6 +7,16 @@ import {
     TableBody,
     TableCell,
 } from "./ui/table";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "./ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
 import axios from "axios";
@@ -28,6 +38,8 @@ const Actors = () => {
     const [openAddActor, setOpenAddActor] = useState(false);
     const [openUpdateActorDetail, setOpenUpdateActorDetail] = useState(false);
     const [selectedActorId, setSelectedActorId] = useState("");
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [actorToDelete, setActorToDelete] = useState<string | null>(null);
 
     const fetchActors = async () => {
         try {
@@ -49,23 +61,33 @@ const Actors = () => {
         setOpenUpdateActorDetail(true);
     };
 
-    const handleDeleteActor = async (actorId: string) => {
-        try {
-            await axios.delete(`https://imdb-clone-backend-971u.onrender.com/api/actors/${actorId}`);
-            toast({
-                description: "Actor deleted successfully.. ✔️",
-            });
-            fetchActors();
-        } catch (error) {
-            console.log(error);
+    const handleDeleteActor = async () => {
+        if (actorToDelete) {
+            try {
+                await axios.delete(`https://imdb-clone-backend-971u.onrender.com/api/actors/${actorToDelete}`);
+                toast({
+                    variant: "dark",
+                    description: "Actor deleted successfully.. ✔️",
+                });
+                fetchActors();
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setShowDeleteDialog(false);
+                setActorToDelete(null);
+            }
         }
+    };
+
+    const confirmDeleteActor = (actorId: string) => {
+        setActorToDelete(actorId);
+        setShowDeleteDialog(true);
     };
 
     return (
         <div className="container mx-auto px-4 md:px-6 py-8">
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold">Actors</h1>
-
                 <Button onClick={() => setOpenAddActor(true)}>Add Actor</Button>
             </div>
             <div className="bg-white dark:bg-gray-950 rounded-lg shadow-md overflow-hidden">
@@ -89,7 +111,6 @@ const Actors = () => {
                             {actors.map((actor, index: number) => (
                                 <TableRow key={actor._id}>
                                     <TableCell>{index + 1}</TableCell>
-
                                     <TableCell className="font-medium">{actor.name}</TableCell>
                                     <TableCell>{actor.dob}</TableCell>
                                     <TableCell>{actor.gender}</TableCell>
@@ -111,7 +132,7 @@ const Actors = () => {
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
-                                                onClick={() => actor._id && handleDeleteActor(actor._id)}
+                                                onClick={() => actor._id && confirmDeleteActor(actor._id)}
                                             >
                                                 Delete
                                             </Button>
@@ -135,6 +156,27 @@ const Actors = () => {
                 actorId={selectedActorId}
                 fetchActors={fetchActors}
             />
+
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will permanently delete the actor from your collection.
+                            This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteActor}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

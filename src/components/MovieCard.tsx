@@ -8,10 +8,22 @@ import { Producer } from "./Producers";
 import { Movie } from "./Movies";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
 
 function MovieCard({ movie, fetchMovies }: { movie: Movie, fetchMovies: () => void }) {
   const [producerList, setProducerList] = useState<Producer[]>([]);
   const [actorList, setActorList] = useState<Actor[]>([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [movieToDelete, setMovieToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,25 +60,35 @@ function MovieCard({ movie, fetchMovies }: { movie: Movie, fetchMovies: () => vo
   };
 
   const handleDeleteMovie = async (movieId: string) => {
-    try {
-      await axios.delete(`https://imdb-clone-backend-971u.onrender.com/api/movies/${movieId}`);
-      toast({
-        description: "Movie deleted successfully.. ✔️",
-      });
-      fetchMovies()
-    } catch (error) {
-      toast({
-        description: "Error deleting movie.. ❌",
-      });
-      console.log(error);
+    setMovieToDelete(movieId);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteMovie = async () => {
+    if (movieToDelete) {
+      try {
+        await axios.delete(`https://imdb-clone-backend-971u.onrender.com/api/movies/${movieToDelete}`);
+        toast({
+          variant: "dark",
+          description: "Movie deleted successfully.. ✔️",
+        });
+        fetchMovies();
+      } catch (error) {
+        toast({
+          variant: "dark",
+          description: "Error deleting movie.. ❌",
+        });
+        console.log(error);
+      } finally {
+        setShowDeleteDialog(false);
+        setMovieToDelete(null);
+      }
     }
-
-
-  }
+  };
 
   const handleEditMovie = (movieId: string) => {
     navigate("/movies/add", { state: { movieId } });
-  }
+  };
 
   return (
     <div className='flex items-center justify-center'>
@@ -127,6 +149,27 @@ function MovieCard({ movie, fetchMovies }: { movie: Movie, fetchMovies: () => vo
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the movie from your collection.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteMovie}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

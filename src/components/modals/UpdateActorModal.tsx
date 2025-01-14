@@ -41,6 +41,7 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
     const handleUpdateActor = async () => {
         if (!editingActor.name || !editingActor.dob || !editingActor.gender || !editingActor.bio) {
             toast({
+                variant: "dark",
                 description: "All fields are required.",
             });
             return;
@@ -49,12 +50,14 @@ const UpdateActorModal: React.FC<UpdateActorModalProps> = ({ openUpdateActorDeta
         try {
             await axios.put(`https://imdb-clone-backend-971u.onrender.com/api/actors/${actorId}`, editingActor);
             toast({
+                variant: "dark",
                 description: "Actor updated successfully.. ✔️",
             });
             fetchActors();
             setOpenUpdateActorDetail(false);
         } catch (error) {
             toast({
+                variant: "dark",
                 description: "Error updating actor.. ❌",
             });
             console.error("Error updating actor:", error);

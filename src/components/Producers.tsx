@@ -7,6 +7,16 @@ import {
   TableBody,
   TableCell,
 } from "./ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
 import axios from "axios";
@@ -28,6 +38,8 @@ const Producers = () => {
   const [openUpdateProducerDetail, setOpenUpdateProducerDetail] = useState(false);
   const [selectedProducerId, setSelectedProducerId] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [producerToDelete, setProducerToDelete] = useState<string | null>(null);
 
   const fetchProducers = async () => {
     try {
@@ -49,16 +61,26 @@ const Producers = () => {
     setOpenUpdateProducerDetail(true);
   };
 
-  const handleDeleteProducer = async (producerId: string) => {
+  const handleDeleteProducer = async () => {
+    if (!producerToDelete) return;
     try {
-      await axios.delete(`https://imdb-clone-backend-971u.onrender.com/api/producers/${producerId}`);
+      await axios.delete(`https://imdb-clone-backend-971u.onrender.com/api/producers/${producerToDelete}`);
       toast({
+        variant: "dark",
         description: "Producer deleted successfully.. ✔️",
       });
       fetchProducers();
     } catch (error) {
       console.log(error);
+    } finally {
+      setShowDeleteDialog(false);
+      setProducerToDelete(null);
     }
+  };
+
+  const confirmDeleteProducer = (producerId: string) => {
+    setProducerToDelete(producerId);
+    setShowDeleteDialog(true);
   };
 
   return (
@@ -111,7 +133,7 @@ const Producers = () => {
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => producer._id && handleDeleteProducer(producer._id)}
+                        onClick={() => producer._id && confirmDeleteProducer(producer._id)}
                       >
                         Delete
                       </Button>
@@ -135,6 +157,27 @@ const Producers = () => {
         producerId={selectedProducerId}
         fetchProducers={fetchProducers}
       />
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the producer from your collection.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteProducer}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

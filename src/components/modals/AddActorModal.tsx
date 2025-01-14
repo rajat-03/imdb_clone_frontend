@@ -27,6 +27,7 @@ const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, 
     const handleAddActor = async () => {
         if (!newActor.name || !newActor.dob || !newActor.gender || !newActor.bio) {
             toast({
+                variant: "dark",
                 description: "All fields are required.",
             });
             return;
@@ -35,6 +36,7 @@ const AddActorModal: FC<AddActorModalProps> = ({ openAddActor, setOpenAddActor, 
         try {
             await axios.post("https://imdb-clone-backend-971u.onrender.com/api/actors", newActor);
             toast({
+                variant: "dark",
                 description: "Actor added successfully.. ✔️",
             });
             setOpenAddActor(false);

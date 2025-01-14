@@ -26,6 +26,7 @@ const AddProducerModal: FC<AddProducerModalProps> = ({ openAddProducer, setOpenA
     const handleAddProducer = async () => {
         if (!newProducer.name || !newProducer.dob || !newProducer.gender || !newProducer.bio) {
             toast({
+                variant: "dark",
                 description: "All fields are required.",
             });
             return;
@@ -34,6 +35,7 @@ const AddProducerModal: FC<AddProducerModalProps> = ({ openAddProducer, setOpenA
         try {
             await axios.post("https://imdb-clone-backend-971u.onrender.com/api/producers", newProducer);
             toast({
+                variant: "dark",
                 description: "Producer added successfully.. ✔️",
             });
             setOpenAddProducer(false);

@@ -41,6 +41,7 @@ const UpdateProducerModal: React.FC<UpdateProducerModalProps> = ({ openUpdatePro
     const handleUpdateProducer = async () => {
         if (!editingProducer.name || !editingProducer.dob || !editingProducer.gender || !editingProducer.bio) {
             toast({
+                variant: "dark",
                 description: "All fields are required.",
             });
             return;
@@ -49,12 +50,14 @@ const UpdateProducerModal: React.FC<UpdateProducerModalProps> = ({ openUpdatePro
         try {
             await axios.put(`https://imdb-clone-backend-971u.onrender.com/api/producers/${producerId}`, editingProducer);
             toast({
+                variant: "dark",
                 description: "Producer updated successfully.. ✔️",
             });
             fetchProducers();
             setOpenUpdateProducerDetail(false);
         } catch (error) {
             toast({
+                variant: "dark",
                 description: "Error updating producer.. ❌",
             });
             console.error("Error updating producer:", error);

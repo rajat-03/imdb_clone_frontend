@@ -92,6 +92,7 @@ export default function AddMovieForm() {
 
         if (!movieName || !yearOfRelease || !plot || !poster || !selectedProducer || selectedActors.length === 0) {
             toast({
+                variant: "dark",
                 description: "All fields are required.",
             });
             setIsLoading(false);
@@ -112,6 +113,7 @@ export default function AddMovieForm() {
                 // Update existing movie
                 await axios.put(`https://imdb-clone-backend-971u.onrender.com/api/movies/${state.movieId}`, data);
                 toast({
+                    variant: "dark",
 
                     description: "Movie updated successfully.",
                 });
@@ -119,6 +121,7 @@ export default function AddMovieForm() {
                 // Add new movie
                 await axios.post('https://imdb-clone-backend-971u.onrender.com/api/movies', data);
                 toast({
+                    variant: "dark",
                     description: "Movie added successfully.",
                 });
             }
@@ -126,6 +129,7 @@ export default function AddMovieForm() {
         } catch (error) {
             console.log('error: ', error);
             toast({
+                variant: "dark",
                 description: "Failed to save movie.",
             });
         } finally {
